@@ -25,6 +25,12 @@ import {
 import { formatPrice, formatDate } from '@/lib/utils';
 
 // ── Progress Ring Component ───────────────────
+/**
+ * TODO: [ONBOARDING DATA] Score de Evolução
+ * Dados atuais: mockUser.evolutionScore, mockUser.xp, mockUser.level, mockUser.streak
+ * Futuro: gamificação calculada a partir do histórico de planos da usuária no Supabase.
+ * Não há campo direto no VivaOnboardingResult — será uma tabela separada `viva_progress`.
+ */
 function ProgressRing({
   score,
   size = 120,
@@ -208,7 +214,15 @@ export default function DashboardPage() {
           </div>
         </motion.div>
 
-        {/* ── Próximo Evento ─────────────────── */}
+        {/* ── Próximo Evento ───────────────────
+         *
+         * TODO: [ONBOARDING DATA] Próximo Evento
+         * Dados atuais: mockEvents[0] (tipo, título, data, local, meta emocional)
+         * Futuro: VivaOnboardingResult.event (moment, date, location)
+         * A rotina de preparação virá de: VivaOnboardingResult.timeline
+         * A meta emocional virá de: VivaOnboardingResult.preferences.feelings
+         * Tabela Supabase: `viva_plans` → campos event.* e timeline
+         */}
         <motion.div
           variants={fadeUp}
           initial="hidden"
@@ -281,7 +295,14 @@ export default function DashboardPage() {
           )}
         </motion.div>
 
-        {/* ── Daily Checklist ────────────────── */}
+        {/* ── Daily Checklist ──────────────────
+         *
+         * TODO: [ONBOARDING DATA] Checklist do Dia
+         * Dados atuais: mockDailyChecklist (lista estática)
+         * Futuro: VivaOnboardingResult.checklist
+         * Também acessível via: VivaOnboardingResult.plan.checklist
+         * Tabela Supabase: `viva_plans` → campo checklist (array de strings)
+         */}
         <motion.div
           variants={fadeUp}
           initial="hidden"
@@ -340,7 +361,16 @@ export default function DashboardPage() {
           </ul>
         </motion.div>
 
-        {/* ── Achadinhos ────────────────────── */}
+        {/* ── Achadinhos ─────────────────────
+         *
+         * TODO: [ONBOARDING DATA] Achadinhos
+         * Dados atuais: mockProducts (lista estática, sem filtro real)
+         * Futuro: filtrar/ordenar produtos com base em:
+         *   - VivaOnboardingResult.preferences.style (estilo dominante)
+         *   - VivaOnboardingResult.preferences.budget (faixa de orçamento)
+         *   - VivaOnboardingResult.recommendations.shopOrReuse (contexto)
+         * Tabela Supabase: `viva_plans` → preferences.style + preferences.budget
+         */}
         <motion.div
           variants={fadeUp}
           initial="hidden"
@@ -455,7 +485,14 @@ export default function DashboardPage() {
           )}
         </motion.div>
 
-        {/* ── Inspiração do Dia ─────────────── */}
+        {/* ── Inspiração do Dia ─────────────────
+         *
+         * TODO: [ONBOARDING DATA] Inspiração do Dia
+         * Dados atuais: mockInspiration (frase + autor estáticos)
+         * Futuro: VivaOnboardingResult.vivaNote (frase gerada pela Viva para a usuária)
+         * Também acessível via: VivaOnboardingResult.plan.versionPhrase
+         * Tabela Supabase: `viva_plans` → campo vivaNote
+         */}
         <motion.div
           variants={fadeUp}
           initial="hidden"
