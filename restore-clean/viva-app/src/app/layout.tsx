@@ -20,12 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className={`${inter.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col font-sans">
-        {/* AuthProvider removido do layout global — LP pública não usa Supabase Auth.
-            TODO: quando ativar dashboard real, adicionar AuthProvider no
-            src/app/dashboard/layout.tsx ou em um layout específico de rotas internas. */}
-        {children}
-      </body>
+      <body className="min-h-full flex flex-col font-sans">{children}</body>
     </html>
   );
 }
