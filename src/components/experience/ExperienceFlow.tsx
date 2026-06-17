@@ -1,10 +1,11 @@
 "use client";
 
-import { ArrowLeft, Check, Clipboard, LayoutDashboard, RotateCcw, Sparkles } from "lucide-react";
+import { ArrowLeft, Check, Clipboard, Loader2, RotateCcw, Sparkles } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
-import { generateVivaPlan } from "@/lib/viva/plan-generator";
+import { buildOnboardingResult, generateVivaPlan } from "@/lib/viva/plan-generator";
 import type {
   BudgetOption,
   FeelingOption,
@@ -240,10 +241,13 @@ function ErrorMsg({ message }: { message: string }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function ExperienceFlow() {
+  const router = useRouter();
   const [step, setStep] = useState<Step>(0);
   const [input, setInput] = useState<VivaExperienceInput>(initialInput);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [copied, setCopied] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
   /** Aviso de limite de 3 momentos — exibido inline na etapa, some em 3s */
   const [momentLimitWarning, setMomentLimitWarning] = useState(false);
 
@@ -360,11 +364,13 @@ export function ExperienceFlow() {
   function nextStep() {
     if (!validateCurrentStep()) return;
     setCopied(false);
+    setSaveError("");
     setStep((current) => Math.min(current + 1, 5) as Step);
   }
 
   function previousStep() {
     setCopied(false);
+    setSaveError("");
     setErrors({});
     setStep((current) => Math.max(current - 1, 0) as Step);
   }
@@ -373,6 +379,8 @@ export function ExperienceFlow() {
     setInput(initialInput);
     setErrors({});
     setCopied(false);
+    setIsSaving(false);
+    setSaveError("");
     setMomentLimitWarning(false);
     setStep(0);
   }
@@ -381,6 +389,41 @@ export function ExperienceFlow() {
     if (!plan) return;
     await navigator.clipboard.writeText(formatPlanForClipboard(plan));
     setCopied(true);
+  }
+
+  async function saveAndOpenMinhaViva() {
+    if (!plan || isSaving) return;
+
+    setIsSaving(true);
+    setSaveError("");
+
+    try {
+      const response = await fetch("/api/viva/experience", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(buildOnboardingResult(input, plan)),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success || !data.redirectUrl) {
+        throw new Error(
+          data.error || "Nao conseguimos salvar sua Viva agora. Tente novamente em instantes.",
+        );
+      }
+
+      router.push(data.redirectUrl);
+    } catch (error) {
+      setSaveError(
+        error instanceof Error
+          ? error.message
+          : "Nao conseguimos salvar sua Viva agora. Tente novamente em instantes.",
+      );
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   // ── Render ───────────────────────────────────────────────────────────────
@@ -829,16 +872,23 @@ export function ExperienceFlow() {
                     </span>
                   </button>
 
-                  <Link
-                    href="/dashboard"
-                    className="flex min-h-14 items-center justify-center rounded-2xl gradient-bg px-6 py-4 text-base font-bold text-white shadow-glow transition-opacity hover:opacity-90"
+                  <button
+                    type="button"
+                    onClick={saveAndOpenMinhaViva}
+                    disabled={isSaving}
+                    className="flex min-h-14 items-center justify-center rounded-2xl gradient-bg px-6 py-4 text-base font-bold text-white shadow-glow transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
                   >
                     <span className="flex items-center gap-2">
-                      <LayoutDashboard className="h-5 w-5" />
-                      Ver minha Viva
+                      {isSaving ? (
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                      ) : (
+                        <Sparkles className="h-5 w-5" />
+                      )}
+                      {isSaving ? "Salvando..." : "Ver minha Viva"}
                     </span>
-                  </Link>
+                  </button>
                 </div>
+                {saveError ? <ErrorMsg message={saveError} /> : null}
               </section>
             ) : null}
 
