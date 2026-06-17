@@ -114,6 +114,15 @@ function formatPlanForClipboard(plan: VivaPlan) {
   ].join("\n");
 }
 
+function formatNaturalList(items: string[]) {
+  if (items.length <= 1) {
+    return items[0] || "";
+  }
+
+  const last = items[items.length - 1];
+  return `${items.slice(0, -1).join(", ")} e ${last}`;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Componentes de UI
 // ─────────────────────────────────────────────────────────────────────────────
@@ -727,6 +736,9 @@ export function ExperienceFlow() {
                 </div>
 
                 {/* Chips de preferências salvas */}
+                <p className="mt-4 text-sm font-semibold text-viva-graphite">
+                  Momentos selecionados: {formatNaturalList(input.moments)}
+                </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {input.moments.map((m) => (
                     <span key={m} className="rounded-full border border-viva-success/30 bg-viva-success/10 px-3 py-1 text-xs font-semibold text-viva-success">

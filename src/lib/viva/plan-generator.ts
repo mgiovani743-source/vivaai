@@ -205,7 +205,7 @@ export function generateVivaPlan(input: VivaExperienceInput): VivaPlan {
 
   // Resumo do momento: foco no principal + contexto dos secundários
   const momentCore = [
-    `Você está se preparando para ${primaryMoment.toLowerCase()}`,
+    `O foco principal é ${primaryMoment.toLowerCase()}`,
     dateLabel ? `em ${dateLabel}` : "",
     location ? `em ${location}` : "",
   ]
@@ -214,7 +214,7 @@ export function generateVivaPlan(input: VivaExperienceInput): VivaPlan {
 
   const momentContext =
     secondaryMoments.length > 0
-      ? ` O plano também considera o clima de ${joinList(secondaryMoments.map((m) => m.toLowerCase()))}.`
+      ? `, mas o plano também considera o clima de ${joinList(secondaryMoments.map((m) => m.toLowerCase()))}`
       : "";
 
   const avoidText = avoid
@@ -222,7 +222,7 @@ export function generateVivaPlan(input: VivaExperienceInput): VivaPlan {
     : "Evite excesso de informação no look, sapato sem teste e decisões de última hora que não combinam com o seu conforto.";
 
   return {
-    momentSummary: `${momentCore}.${momentContext} A direção é criar uma preparação com ${direction.cue}, respeitando o que você quer sentir: ${feelings.join(", ")}.`,
+    momentSummary: `${momentCore}${momentContext}. A direção é criar uma preparação com ${direction.cue}, respeitando o que você quer sentir: ${feelings.join(", ")}.`,
     styleDirection: styles.length === 1
       ? `Seu estilo-base é ${styles[0]}. Traduza isso em ${styleDirections[styles[0]] ?? styles[0]}, com foco em ${feelingSentence}.`
       : `Seu plano combina uma base ${joinList(styles)} — ${styleDirectionText}. Tudo isso a favor de ${feelingSentence}.`,
